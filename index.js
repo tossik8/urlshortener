@@ -29,7 +29,9 @@ let number = 1;
 const urls = new Map();
 
 app.post("/api/shorturl", (req, res) => {
-  urls.set(++number, req.body.url);
+  urls.set(number++, req.body.url);
   res.json({"original_url": req.body.url, "short_url": number-1});
 });
-
+app.get("/api/shorturl/:number", (req, res) => {
+  res.redirect(urls.get(+req.params.number));
+})
