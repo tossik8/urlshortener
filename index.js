@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const dns = require("node:dns");
 const app = express();
 const bodyParser = require("body-parser");
 
@@ -29,9 +30,18 @@ let number = 1;
 const urls = new Map();
 
 app.post("/api/shorturl", (req, res) => {
-  urls.set(number++, req.body.url);
-  res.json({"original_url": req.body.url, "short_url": number-1});
+  let { url } = req.body;
+  url = url.replace("https://", "");
+  const domainName = url.replace(/\/.*/, "");
+  dns.lookup(domainName, (err) => {
+    if(err) res.json({"error": "invalid url"});
+    else{
+      urls.set(number++, url);
+      res.json({"original_url": req.body.url, "short_url": number-1});
+    }
+  });
+
 });
 app.get("/api/shorturl/:number", (req, res) => {
-  res.redirect(urls.get(+req.params.number));
+  res.redirect("https://"+urls.get(+req.params.number));
 })
