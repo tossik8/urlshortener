@@ -36,8 +36,14 @@ app.post("/api/shorturl", (req, res) => {
   dns.lookup(domainName, (err) => {
     if(err) res.json({"error": "invalid url"});
     else{
-      urls.set(number++, url);
-      res.json({"original_url": req.body.url, "short_url": number-1});
+      const key = isPresent(url);
+      if(key !== -1){
+        res.json({"original_url": req.body.url, "short_url": key});
+      }
+      else{
+        urls.set(number++, url);
+        res.json({"original_url": req.body.url, "short_url": number-1});
+      }
     }
   });
 
@@ -45,3 +51,11 @@ app.post("/api/shorturl", (req, res) => {
 app.get("/api/shorturl/:number", (req, res) => {
   res.redirect("https://"+urls.get(+req.params.number));
 })
+function isPresent(url){
+  for(let [k, value] of urls){
+    if(value === url){
+      return k;
+    }
+  }
+  return -1;
+}
