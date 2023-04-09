@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const dns = require("node:dns");
+const dns = require("dns");
 const app = express();
 const bodyParser = require("body-parser");
 
